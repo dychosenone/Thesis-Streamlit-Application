@@ -15,13 +15,15 @@ import warnings
 import cv2
 import tqdm
 
-from detectron2.config import get_cfg
-from detectron2.data.detection_utils import read_image
-from detectron2.utils.logger import setup_logger
-from detectron2.data.datasets import register_coco_instances
-from detectron2.data import DatasetCatalog
+#from detectron2.config import get_cfg
+#from detectron2.data.detection_utils import read_image
+#from detectron2.utils.logger import setup_logger
+#from detectron2.data.datasets import register_coco_instances
+#from detectron2.data import DatasetCatalog
 
-from predictor import VisualizationDemo
+#from predictor import VisualizationDemo
+
+import darknet_video 
 
 def setup_cfg(confidence_threshold, model):
 
@@ -126,7 +128,12 @@ if __name__ == "__main__":
 
     option = st.selectbox(
         'Which Model would you like the use?',
-        ('All Data', 'All CCTV Data', 'Lowlight Only', 'Daytime Only', 'Nighttime CCTV', 'Daytime NonCCTV', 'Nighttime NonCCTV', 'Daytime CCTV'))
+        ('All Data', 'All CCTV Data', 'Lowlight Only', 'Daytime Only', 'Nighttime CCTV', 
+         'Daytime NonCCTV', 'Nighttime NonCCTV', 'Daytime CCTV'))
+    
+    architecture_option = st.selectbox(
+        'Model Architecture',
+        ('YOLOv4', 'Faster R-CNN'))
     
     confidence_threshold = st.slider('Confidence Threshold?', 0, 100, 50)
 
@@ -134,18 +141,46 @@ if __name__ == "__main__":
 
     if st.button('Submit'):
         
-        mp.set_start_method("spawn", force=True)
-        cfg = setup_cfg(confidence_threshold, option)
+        if (architecture_option=='Faster R-CNN'):
+            
+            print('Faster R-CNN was selected')
 
-        demo = VisualizationDemo(cfg)
-        processVideo(file)
+            mp.set_start_method("spawn", force=True)
+            cfg = setup_cfg(confidence_threshold, option)
 
-        st.subheader('Output')
+            demo = VisualizationDemo(cfg)
+            processVideo(file)
 
-        video_file = open('test - result.mp4', 'rb')
-        video_bytes = video_file.read()
+            st.subheader('Output')
 
-        st.video(video_bytes)
+            video_file = open('test - result.mp4', 'rb')
+            video_bytes = video_file.read()
+
+            st.video(video_bytes)
+
+        elif (architecture_option=='YOLOv4'):
+
+            tfile = tempfile.NamedTemporaryFile(delete=False) 
+            tfile.write(file.read())
+
+            outputname = 'yolodemo.mp4'
+
+            print('YOLOv4 was selected')
+
+            yolo = darknet_video.DarknetVideo()
+
+            yolo.yolov4detect('YOLOConfigs/cfg/yolow.cfg',
+                         'YOLOConfigs/data/yolodemo.data',
+                         'YOLOConfigs/weights/alldatabest.weights', #todo: function for changing weights/model, currently just set to all data model
+                         tfile.name,
+                         outputname,
+                         confidence_threshold * .01)
+            
+            # Display video once saved #
+            st.subheader('Output')
+            video_file = open(outputname, 'rb')
+            video_bytes = video_file.read()
+            st.video(video_bytes)
 
     else:
         st.write("Please upload a file.")
