@@ -156,3 +156,4 @@ Faster RCNN Configs/
 *.mp4
 
 YOLOConfigs/
+*.zip

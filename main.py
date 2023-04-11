@@ -160,6 +160,12 @@ if __name__ == "__main__":
 
         elif (architecture_option=='YOLOv4'):
 
+            # format path to weights file for yolo #
+            print("weights picked:")
+            selected_weights = option.split()
+            selected_weights = 'YOLOConfigs/weights/' + ''.join(selected_weights) + '.weights'
+            print(selected_weights)
+
             tfile = tempfile.NamedTemporaryFile(delete=False) 
             tfile.write(file.read())
 
@@ -171,7 +177,7 @@ if __name__ == "__main__":
 
             yolo.yolov4detect('YOLOConfigs/cfg/yolow.cfg',
                          'YOLOConfigs/data/yolodemo.data',
-                         'YOLOConfigs/weights/alldatabest.weights', #todo: function for changing weights/model, currently just set to all data model
+                         selected_weights,
                          tfile.name,
                          outputname,
                          confidence_threshold * .01)
