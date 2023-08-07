@@ -65,6 +65,7 @@ def test_opencv_video_format(codec, file_ext):
             return True
         return False
 
+# Function for Faster R-CNN # 
 def processVideo (file):
     
     if file is not None:
@@ -84,7 +85,7 @@ def processVideo (file):
     num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     basename = os.path.basename(file.name)
     codec, file_ext = (
-        ("x264", ".mkv") if test_opencv_video_format("x264", ".mkv") else ("mp4v", ".mp4")
+        ("x264", ".mkv", ".ts") if test_opencv_video_format("x264", ".mkv", ".ts") else ("mp4v", ".mp4")
     )
     if codec == ".mp4v":
         warnings.warn("x264 codec not available, switching to mp4v")
@@ -128,8 +129,8 @@ if __name__ == "__main__":
 
     option = st.selectbox(
         'Which Model would you like the use?',
-        ('All Data', 'All CCTV Data', 'Lowlight Only', 'Daytime Only', 'Nighttime CCTV', 
-         'Daytime NonCCTV', 'Nighttime NonCCTV', 'Daytime CCTV'))
+        ('All Data', 'All CCTV Data', 'All Lowlight', 'All Daytime', 'Lowlight CCTV', 
+         'Daytime NonCCTV', 'Lowlight NonCCTV', 'Daytime CCTV'))
     
     architecture_option = st.selectbox(
         'Model Architecture',
@@ -138,6 +139,11 @@ if __name__ == "__main__":
     confidence_threshold = st.slider('Confidence Threshold?', 0, 100, 50)
 
     file = st.file_uploader("Pick a file", type=["mp4"])
+
+    savename = st.text_input("Save video as ", "detected.mp4")
+
+    if not savename.lower().endswith('.mp4'):
+        savename += '.mp4'
 
     if st.button('Submit'):
         
@@ -169,7 +175,8 @@ if __name__ == "__main__":
             tfile = tempfile.NamedTemporaryFile(delete=False) 
             tfile.write(file.read())
 
-            outputname = 'yolodemo.mp4'
+            #outputname = 'yolodemo.mp4'
+            outputname = savename
 
             print('YOLOv4 was selected')
 
