@@ -15,13 +15,13 @@ import warnings
 import cv2
 import tqdm
 
-#from detectron2.config import get_cfg
-#from detectron2.data.detection_utils import read_image
-#from detectron2.utils.logger import setup_logger
-#from detectron2.data.datasets import register_coco_instances
-#from detectron2.data import DatasetCatalog
+from detectron2.config import get_cfg
+from detectron2.data.detection_utils import read_image
+from detectron2.utils.logger import setup_logger
+from detectron2.data.datasets import register_coco_instances
+from detectron2.data import DatasetCatalog
 
-#from predictor import VisualizationDemo
+from predictor import VisualizationDemo
 
 import darknet_video 
 
@@ -85,12 +85,12 @@ def processVideo (file):
     num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     basename = os.path.basename(file.name)
     codec, file_ext = (
-        ("x264", ".mkv", ".ts") if test_opencv_video_format("x264", ".mkv", ".ts") else ("mp4v", ".mp4")
+        ("x264", ".mkv") if test_opencv_video_format("x264", ".mkv") else ("mp4v", ".mp4")
     )
     if codec == ".mp4v":
         warnings.warn("x264 codec not available, switching to mp4v")
 
-    output = "test - result.mp4"
+    output = savename
 
     if output:
         if os.path.isdir(output):
@@ -110,7 +110,8 @@ def processVideo (file):
             isColor=True,
         )
 
-    assert os.path.isfile(file.name)
+    print("Filename", file.name)
+    # assert os.path.isfile(file.name)
     for vis_frame in tqdm.tqdm(demo.run_on_video(video), total=num_frames):
         output_file.write(vis_frame)
 
@@ -159,7 +160,7 @@ if __name__ == "__main__":
 
             st.subheader('Output')
 
-            video_file = open('test - result.mp4', 'rb')
+            video_file = open(savename, 'rb')
             video_bytes = video_file.read()
 
             st.video(video_bytes)
