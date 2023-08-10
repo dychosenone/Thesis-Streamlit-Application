@@ -46,6 +46,8 @@ def setup_cfg(confidence_threshold, model):
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = confidence_threshold / 100
     cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = confidence_threshold / 100
 
+    # cfg.MODEL.DEVICE='cpu'
+
     cfg.freeze()
     return cfg
 
@@ -130,7 +132,7 @@ if __name__ == "__main__":
 
     option = st.selectbox(
         'Which Model would you like the use?',
-        ('All Data', 'All CCTV Data', 'All Lowlight', 'All Daytime', 'Lowlight CCTV', 
+        ('All Data', 'All CCTV', 'All Lowlight', 'All Daytime', 'Lowlight CCTV', 
          'Daytime NonCCTV', 'Lowlight NonCCTV', 'Daytime CCTV'))
     
     architecture_option = st.selectbox(
